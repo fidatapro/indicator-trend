@@ -152,6 +152,10 @@ export function getRealValue(number) {
     return formatter.format(Math.floor(number * Math.pow(10, pos)) / Math.pow(10, pos));
   }
 }
+export function getRealValue4(number) {
+  if(!number) return 0
+  return number.toFixed(4).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+}
 const formatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',

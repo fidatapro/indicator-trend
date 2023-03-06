@@ -187,21 +187,16 @@
       </template>
       <template v-slot:[`item.support`]="{ item }">
         <span :class="getSportColor(item.coin_price, item.support)">
-          {{ getRealValue(item.support) }}
+          {{ `$${getRealValue4(item.support)}` }}
         </span>
       </template>
       <template v-slot:[`item.resistance`]="{ item }">
         <span :class="getResistanceColor(item.coin_price, item.resistance)">
-          {{ getRealValue(item.resistance) }}
+          {{ `$${getRealValue4(item.resistance)}` }}
         </span>
       </template>
     </v-data-table>
-    <dialogColumn
-      ref="dialogColumn"
-      typeColumn="rsi"
-      :listFields="listFields"
-      @reset="initialize()"
-    ></dialogColumn>
+   
   </div>
 </template>
 <script>
@@ -213,6 +208,7 @@ import {
   getScoreColor,
   getSportColor,
   getResistanceColor,
+  getRealValue4,
   getRealValue,
   debounce,
   getBaseLineColor,
@@ -232,6 +228,7 @@ export default {
     getSportColor,
     getResistanceColor,
     flooNumber,
+    getRealValue4,
     getBaseLineColor,
     headers: [
       {
@@ -239,6 +236,7 @@ export default {
         align: "start",
         sortable: false,
         value: "icon",
+        fixed: true,
       },
       {
         text: "1-500",
@@ -246,9 +244,16 @@ export default {
         sortable: false,
         value: "rank",
         width: "70px",
+        fixed: true,
       },
-      { text: "NAME", width: "250px", value: "coin_name", align: "start" },
-      { text: "PRICE", value: "coin_price", align: "start" },
+      {
+        text: "NAME",
+        width: "200px",
+        value: "coin_name",
+        align: "start",
+        fixed: true,
+      },
+      { text: "PRICE", value: "coin_price", align: "start", fixed: true },
       { text: "SCORE", value: "technical_score", align: "end", isFilter: true }, // duoi 30 do , tren 70 xanh
       {
         text: "TREND DAILY",
@@ -283,17 +288,17 @@ export default {
         value: "trend_mean",
         align: "end",
         isFilter: true,
-      }, 
+      },
 
-      { text: "SAFETY", value: "safety", align: "end", isFilter: true }, 
+      { text: "SAFETY", value: "safety", align: "end", isFilter: true },
       {
         text: "TREND BASELINE",
         value: "baseline_1h",
         align: "end",
         isFilter: true,
-      }, 
+      },
       { text: "SUPPORT", value: "support", align: "end", isFilter: true },
-      { text: "RESISTANCE", value: "resistance", align: "end", isFilter: true }, 
+      { text: "RESISTANCE", value: "resistance", align: "end", isFilter: true },
     ],
     pagination: {
       page: 1,
@@ -346,6 +351,7 @@ export default {
         support: x.support,
         resistance: x.resistance,
       }));
+      this.data = this.data.filter((x) => x.technical_score && x.trend_daily);
       this.data_table = this.data;
       this.$refs.dialogColumn.setLisColumnShow();
       this.getColumnShow();
@@ -414,6 +420,7 @@ export default {
       }));
     },
   },
+  mounted() {},
 };
 </script>
 <style>
@@ -447,5 +454,8 @@ export default {
 
 .theme--dark.v-data-table > .v-data-table__wrapper > table > thead > tr > th {
   color: white;
+}
+.table-holder, .table-responsive {
+  position: relative;
 }
 </style>

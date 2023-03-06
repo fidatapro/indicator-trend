@@ -7,7 +7,7 @@ const routes = [
   {
     path: '/',
     name: 'macd',
-    component: () => import("@/views/trend-main.vue")
+    component: () => import("@/views/trend-main-1.vue")
   }
 ]
 const router = new VueRouter({
