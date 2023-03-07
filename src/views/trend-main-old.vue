@@ -93,14 +93,11 @@
       <template v-slot:no-data>
         <v-btn color="primary" @click="initialize"> Reset </v-btn>
       </template>
-      <!-- <template v-slot:header="{ props }">
-        <th v-for="(head, i) in props.headers" :key="i" class="normal headers">
-          {{ head.text }}
-        </th>
-      </template> -->
-
       <template v-slot:[`item.icon`]="{ item }">
-        <div class="d-flex align-center">
+        <div
+          class="d-flex align-center"
+          style="border-right: thin solid hsla(0, 0%, 100%, 0.12)"
+        >
           <v-btn depressed @click="addFavorite(item)">
             <div
               class="d-flex"
@@ -123,14 +120,14 @@
           <div class="mx-5">
             {{ item.rank }}
           </div>
-          <div class="d-flex align-center mx-5">
+          <div class="d-flex mx-5">
             <img
               style="width: 30px; padding-right: 8px; vertical-align: middle"
               :src="getSrc(item.coin_symbol)"
             />
-            <span class="ml-1">
+            <div class="ml-1 text-start">
               {{ item.coin_name }}
-            </span>
+            </div>
           </div>
         </div>
       </template>
@@ -517,11 +514,11 @@ export default {
   left: 0;
 }
 .v-data-table tr > td:first-child {
-  background-color: black;
+  background-color: #1e1e1e;
   z-index: 2;
 }
 .v-data-table th:first-child {
-  background-color: black;
+  background-color: #1e1e1e;
   z-index: 2;
   position: -webkit-sticky;
   position: sticky;
