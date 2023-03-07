@@ -1,204 +1,281 @@
 <template>
-  <div>
-    <v-data-table
-      :headers="headers_"
-      :items="data_table"
-      sort-by="calories"
-      class="custom_table_class"
-      :options.sync="pagination"
-      @update:page="updatePage()"
-      :footer-props="footerProps"
-      :loading="loading"
-    >
-      <template v-slot:[`item.icon`]="{ item }">
-        <v-btn depressed @click="addFavorite(item)">
-          <div class="d-flex">
+  <div class="d-flex flex-column">
+    <v-toolbar flat class="py-2">
+      <v-toolbar-title>Trend table</v-toolbar-title>
+      <v-divider class="mx-4" inset vertical></v-divider>
+      <div style="width: 400px" class="d-flex align-center flex-grow-0">
+        <v-text-field
+          label="Search ..."
+          append-icon="mdi-magnify"
+          hide-details
+          style="width: 50px !important"
+          v-model="form.search"
+        ></v-text-field>
+      </div>
+      <v-spacer></v-spacer>
+      <v-btn depressed @click="clickFilterColumn()">
+        <div class="d-flex">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            role="img"
+            aria-hidden="true"
+            class="v-icon__svg"
+          >
+            <path
+              d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"
+            ></path>
+          </svg>
+          <div class="mt-auto">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               role="img"
               aria-hidden="true"
               class="v-icon__svg"
-              :class="{ 'color-favorite': checkFavorite(item) }"
+              style="font-size: 14px; height: 14px; width: 14px"
             >
               <path
-                d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
+                d="M12,17C10.89,17 10,16.1 10,15C10,13.89 10.89,13 12,13A2,2 0 0,1 14,15A2,2 0 0,1 12,17M18,20V10H6V20H18M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V10C4,8.89 4.89,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"
               ></path>
             </svg>
           </div>
-        </v-btn>
-      </template>
-      <template v-slot:top>
-        <v-toolbar flat class="py-2">
-          <v-toolbar-title>Trend table</v-toolbar-title>
-          <v-divider class="mx-4" inset vertical></v-divider>
-          <div style="width: 400px" class="d-flex align-center flex-grow-0">
-            <v-text-field
-              label="Search ..."
-              append-icon="mdi-magnify"
-              hide-details
-              style="width: 50px !important"
-              v-model="form.search"
-            ></v-text-field>
-          </div>
-          <v-spacer></v-spacer>
-          <v-btn depressed @click="clickFilterColumn()">
-            <div class="d-flex">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                role="img"
-                aria-hidden="true"
-                class="v-icon__svg"
-              >
-                <path
-                  d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"
-                ></path>
-              </svg>
-              <div class="mt-auto">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  role="img"
-                  aria-hidden="true"
-                  class="v-icon__svg"
-                  style="font-size: 14px; height: 14px; width: 14px"
-                >
-                  <path
-                    d="M12,17C10.89,17 10,16.1 10,15C10,13.89 10.89,13 12,13A2,2 0 0,1 14,15A2,2 0 0,1 12,17M18,20V10H6V20H18M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V10C4,8.89 4.89,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"
-                  ></path>
-                </svg>
-              </div>
-            </div>
-          </v-btn>
-          <v-btn
-            depressed
-            @click="clickFavorite()"
-            :color="check_favorite ? 'primary' : 'default'"
-          >
-            <div class="d-flex">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                role="img"
-                aria-hidden="true"
-                class="v-icon__svg"
-              >
-                <path
-                  d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
-                ></path>
-              </svg>
-              <div class="mt-auto">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  role="img"
-                  aria-hidden="true"
-                  class="v-icon__svg"
-                  style="font-size: 14px; height: 14px; width: 14px"
-                >
-                  <path
-                    d="M12,17C10.89,17 10,16.1 10,15C10,13.89 10.89,13 12,13A2,2 0 0,1 14,15A2,2 0 0,1 12,17M18,20V10H6V20H18M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V10C4,8.89 4.89,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"
-                  ></path>
-                </svg>
-              </div>
-            </div>
-          </v-btn>
-        </v-toolbar>
-      </template>
-      <!-- eslint-disable-next-line -->
-      <template v-slot:no-data>
-        <v-btn color="primary" @click="initialize"> Reset </v-btn>
-      </template>
-      <!-- eslint-disable-next-line -->
-      <template v-slot:item.coin_name="{ item }">
-        <img
-          style="width: 30px; padding-right: 8px; vertical-align: middle"
-          :src="getSrc(item.coin_symbol)"
-        />
-        {{ item.coin_name }}
-      </template>
-      <!-- eslint-disable-next-line -->
-      <template v-slot:item.coin_price="{ item }">
-        <div
-          :class="getStatus(item.status, item.id)"
-          class="py-2 d-flex flex-wrap flex-grow-1"
-        >
-          <span>
-            {{ `${getRealValue(item.coin_price)}` }}
-          </span>
         </div>
-      </template>
-      <!-- eslint-disable-next-line -->
-      <template v-slot:[`item.technical_score`]="{ item }">
-        <span :class="getScoreColor(item.technical_score)">
-          {{ `${item.technical_score}%` }}
-        </span>
-      </template>
-      <template v-slot:[`item.trend_daily`]="{ item }">
-        <span :class="getPersonChangeColor(item.trend_daily)">
-          {{ `${item.trend_daily}%` }}
-        </span>
-      </template>
-      <template v-slot:[`item.trend_short`]="{ item }">
-        <span :class="getPersonChangeColor(item.trend_short)">
-          {{ `${item.trend_short}%` }}
-        </span>
-      </template>
-      <template v-slot:[`item.trend_mid`]="{ item }">
-        <span :class="getPersonChangeColor(item.trend_mid)">
-          {{ `${item.trend_mid}%` }}
-        </span>
-      </template>
-      <template v-slot:[`item.trend_long`]="{ item }">
-        <span :class="getPersonChangeColor(item.trend_long)">
-          {{ `${item.trend_long}%` }}
-        </span>
-      </template>
-      <template v-slot:[`item.trend_distant`]="{ item }">
-        <span :class="getPersonChangeColor(item.trend_distant)">
-          {{ `${item.trend_distant}%` }}
-        </span>
-      </template>
-      <template v-slot:[`item.trend_4h`]="{ item }">
-        <span :class="getPersonChangeColor(item.trend_4h)">
-          {{ `${item.trend_4h}%` }}
-        </span>
-      </template>
-      <template v-slot:[`item.trend_24h`]="{ item }">
-        <span :class="getPersonChangeColor(item.trend_24h)">
-          {{ `${item.trend_24h}%` }}
-        </span>
-      </template>
-      <template v-slot:[`item.trend_mean`]="{ item }">
-        <span :class="getPersonChangeColor(item.trend_mean)">
-          {{ `${item.trend_mean}%` }}
-        </span>
-      </template>
-      <template v-slot:[`item.safety`]="{ item }">
-        <span class="normal">
-          {{ item.safety }}
-        </span>
-      </template>
-      <template v-slot:[`item.baseline_1h`]="{ item }">
-        <span :class="getBaseLineColor(item.coin_price, item.baseline_1h)">
-          {{ getRealValue(item.baseline_1h) }}
-        </span>
-      </template>
-      <template v-slot:[`item.support`]="{ item }">
-        <span :class="getSportColor(item.coin_price, item.support)">
-          {{ `$${getRealValue4(item.support)}` }}
-        </span>
-      </template>
-      <template v-slot:[`item.resistance`]="{ item }">
-        <span :class="getResistanceColor(item.coin_price, item.resistance)">
-          {{ `$${getRealValue4(item.resistance)}` }}
-        </span>
-      </template>
-    </v-data-table>
-   
+      </v-btn>
+      <v-btn
+        depressed
+        @click="clickFavorite()"
+        :color="check_favorite ? 'primary' : 'default'"
+      >
+        <div class="d-flex">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            role="img"
+            aria-hidden="true"
+            class="v-icon__svg"
+          >
+            <path
+              d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
+            ></path>
+          </svg>
+          <div class="mt-auto">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              role="img"
+              aria-hidden="true"
+              class="v-icon__svg"
+              style="font-size: 14px; height: 14px; width: 14px"
+            >
+              <path
+                d="M12,17C10.89,17 10,16.1 10,15C10,13.89 10.89,13 12,13A2,2 0 0,1 14,15A2,2 0 0,1 12,17M18,20V10H6V20H18M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V10C4,8.89 4.89,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"
+              ></path>
+            </svg>
+          </div>
+        </div>
+      </v-btn>
+    </v-toolbar>
+    <div class="mb-2">
+      <el-table
+        :data="pagedTableData"
+        style="width: 100%; height: 100%; font-weight: 400; color: white"
+        :header-cell-style="{ background: '#121212', color: 'white' }"
+        :cell-style="{ background: '#121212' }"
+        ref="dilog"
+        empty-text="Loading..."
+        >
+        <!-- :row-style="{ background: '#121212' }" -->
+        <el-table-column fixed="left" prop="icon" label="" width="120">
+          <template slot-scope="scope">
+            <v-btn depressed @click="addFavorite(scope.row)">
+              <div class="d-flex">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  role="img"
+                  aria-hidden="true"
+                  class="v-icon__svg"
+                  :class="{ 'color-favorite': checkFavorite(scope.row) }"
+                >
+                  <path
+                    d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
+                  ></path>
+                </svg>
+              </div>
+            </v-btn>
+          </template>
+        </el-table-column>
+        <el-table-column fixed="left" prop="rank" label="1-500" width="80">
+          <template slot-scope="scope">
+            {{ `${scope.row.rank}` }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          fixed="left"
+          prop="coin_name"
+          label="NAME"
+          width="200"
+          class-name="colCel"
+        >
+          <template slot-scope="scope">
+            <img
+              style="width: 30px; padding-right: 8px; vertical-align: middle"
+              :src="getSrc(scope.row.coin_symbol)"
+            />
+            {{ scope.row.coin_name }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="coin_price"
+          label="PRICE"
+          width="130"
+          align="center"
+          v-if="headers_.filter((x) => x.value == 'coin_price')"
+        >
+          <template slot-scope="scope">
+            <span :class="getStatus(scope.row.status, scope.row.id)">
+              {{ `${getRealValue(scope.row.coin_price)}` }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="technical_score"
+          label="SCORE"
+          width="130"
+          align="center"
+          v-if="headers_.filter((x) => x.value == 'technical_score')"
+        >
+          <template slot-scope="scope">
+            <span :class="getScoreColor(scope.row.technical_score)">
+              {{ `${scope.row.technical_score}%` }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="trend_daily"
+          label="TREND DAILY"
+          width="130"
+          align="center"
+        >
+          <template slot-scope="scope">
+            <span :class="getPersonChangeColor(scope.row.trend_daily)">
+              {{ `${scope.row.trend_daily}%` }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="trend_short"
+          label="TREND SHORT"
+          width="130"
+          align="center"
+        >
+          <template slot-scope="scope">
+            <span :class="getPersonChangeColor(scope.row.trend_short)">
+              {{ `${scope.row.trend_short}%` }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="trend_mid" label="TREND MID" width="130" align="center">
+          <template slot-scope="scope">
+            <span :class="getPersonChangeColor(scope.row.trend_mid)">
+              {{ `${scope.row.trend_mid}%` }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="trend_long" label="TREND LONG" width="130" align="center">
+          <template slot-scope="scope">
+            <span :class="getPersonChangeColor(scope.row.trend_long)">
+              {{ `${scope.row.trend_long}%` }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="trend_distant" label="TREND DISTANT" width="130" align="center">
+          <template slot-scope="scope">
+            <span :class="getPersonChangeColor(scope.row.trend_distant)">
+              {{ `${scope.row.trend_distant}%` }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="trend_4h" label="TREND 4H" width="130" align="center">
+          <template slot-scope="scope">
+            <span :class="getPersonChangeColor(scope.row.trend_4h)">
+              {{ `${scope.row.trend_4h}%` }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="trend_24h" label="TREND 24H" width="130" align="center">
+          <template slot-scope="scope">
+            <span :class="getPersonChangeColor(scope.row.trend_24h)">
+              {{ `${scope.row.trend_24h}%` }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="trend_mean" label="TREND MEAN" width="130" align="center">
+          <template slot-scope="scope">
+            <span :class="getPersonChangeColor(scope.row.trend_mean)">
+              {{ `${scope.row.trend_mean}%` }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="safety" label="SAFETY" width="130" align="center">
+          <template slot-scope="scope">
+            <span class="normal">
+              {{ scope.row.safety }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="baseline_1h" label="TREND BASELINE" width="135" align="center">
+          <template slot-scope="scope">
+            <span
+              :class="
+                getBaseLineColor(scope.row.coin_price, scope.row.baseline_1h)
+              "
+            >
+              {{ getRealValue(scope.row.baseline_1h) }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="support" label="SUPPORT" width="130" align="center">
+          <template slot-scope="scope">
+            <span
+              :class="getSportColor(scope.row.coin_price, scope.row.support)"
+            >
+              {{ `$${getRealValue4(scope.row.support)}` }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="coin_price" label="RESISTANCE" width="130" align="center">
+          <template slot-scope="scope">
+            <span
+              :class="
+                getResistanceColor(scope.row.coin_price, scope.row.resistance)
+              "
+            >
+              {{ `$${getRealValue4(scope.row.resistance)}` }}
+            </span>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+    <div class="justify-end text-end mt-2 black">
+      <el-pagination
+        layout="prev, pager, next"
+        :total="data_table.length"
+        @current-change="setPage"
+        class=""
+      >
+      </el-pagination>
+    </div>
+    <dialogColumn
+      ref="dialogColumn"
+      typeColumn="trend"
+      :listFields="listFields"
+      @reset="initialize()"
+    ></dialogColumn>
   </div>
 </template>
+
 <script>
 import {
   getData,
@@ -317,6 +394,8 @@ export default {
     },
     check_favorite: false,
     headers_: [],
+    page: 1,
+    pageSize: 25,
   }),
   watch: {
     "form.search": {
@@ -329,6 +408,9 @@ export default {
     this.initialize();
   },
   methods: {
+    setPage(val) {
+      this.page = val;
+    },
     async initialize() {
       this.loading = true;
       const coin_data = await getData();
@@ -352,6 +434,7 @@ export default {
         resistance: x.resistance,
       }));
       this.data = this.data.filter((x) => x.technical_score && x.trend_daily);
+      this.$refs.dilog.doLayout();
       this.data_table = this.data;
       this.$refs.dialogColumn.setLisColumnShow();
       this.getColumnShow();
@@ -419,6 +502,12 @@ export default {
         value: x.value,
       }));
     },
+    pagedTableData() {
+      return this.data_table.slice(
+        this.pageSize * this.page - this.pageSize,
+        this.pageSize * this.page
+      );
+    },
   },
   mounted() {},
 };
@@ -455,7 +544,51 @@ export default {
 .theme--dark.v-data-table > .v-data-table__wrapper > table > thead > tr > th {
   color: white;
 }
-.table-holder, .table-responsive {
+.table-holder,
+.table-responsive {
   position: relative;
+}
+.el-table td.el-table__cell,
+.el-table th.el-table__cell.is-leaf {
+  border-bottom: thin solid hsla(0, 0%, 100%, 0.12);
+}
+/* .el-table td.el-table__cell, .el-table:nth-child(2) th.el-table__cell.is-leaf {
+    border-left: thin solid hsla(0, 0%, 100%, 0.12);
+} */
+.colCel {
+  border-right: thin solid hsla(0, 0%, 100%, 0.12);
+}
+
+.color-black {
+  background-color: hsla(0, 0%, 100%, 0.12);
+  color: white;
+}
+.el-pager li {
+  padding: 0 4px;
+  background: hsla(0, 0%, 100%, 0.12) !important;
+  color: white !important;
+  font-size: 13px;
+  min-width: 35.5px;
+  height: 28px;
+  line-height: 28px;
+  box-sizing: border-box;
+  text-align: center;
+}
+.el-pagination button:disabled {
+  color: #c0c4cc;
+  background-color: black;
+  cursor: not-allowed;
+}
+.el-pagination .btn-next,
+.el-pagination .btn-prev {
+  background: center center no-repeat #fff;
+  background-size: 16px;
+  cursor: pointer;
+  margin: 0;
+  background-color: black !important;
+  color: white !important;
+}
+.el-table--enable-row-hover .el-table__body tr:hover > td {
+  background-color: #f5f7fa !important;
 }
 </style>
