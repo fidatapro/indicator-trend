@@ -531,4 +531,8 @@ export default {
 .thead > tr > th:first-child {
   background-color: azure;
 }
+.v-data-table {
+  background:url(@/assets/watermarked.png) no-repeat; 
+  background-position: center;
+}
 </style>
